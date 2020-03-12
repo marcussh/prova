@@ -3,13 +3,15 @@
     <h2>Cadastro</h2>
     <form @submit.prevent="cadastrar()">
       <label for="nome">Nome</label>
-      <input id="nome" name="nome" type="text" v-model="dados.nome">
+      <input v-validate data-vv-rules="required" id="nome" data-vv-as="Nome" name="nome" type="text" v-model="dados.nome">
+      <span v-show="errors.has('nome')">{{ errors.first('nome') }}</span>
       
 
 
 
       <label for="telefone">Telefone</label>
-      <input id="telefone" name="telefone" type="text" v-model="dados.telefone">
+      <input id="telefone" name="telefone" v-validate data-vv-rules="required" type="text" v-model="dados.telefone">
+      <span v-show="errors.has('telefone')">{{ errors.first('telefone') }}</span>
       <!--
       <label for="como_conheceu">Como nos conheceu?</label>
       <select v-model="selected">
@@ -58,8 +60,16 @@ export default {
   methods: {
     cadastrar() {
 
-      this.$http.post('http://localhost:3000/bd', this.dados)
+      this.$validator
+      .validateAll()
+      .then(success => {
+        if (success){
+         this.$http.post('http://localhost:3000/bd', this.dados)
       .then(() => this.dados = new Dados(), err => console.log(err));
+        }
+      });
+
+     
 
       console.log(this.dados.nome);
       console.log(this.dados.telefone);
